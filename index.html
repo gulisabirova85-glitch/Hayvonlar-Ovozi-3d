@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hayvonlar Olami 3D</title>
+<style>
+:root{--bg:#04120c;--fg:#e8f5ee;--card:rgba(255,255,255,.07);--em:#2fe3a0;--blue:#4cb8ff;--gold:#f0c24b;--line:rgba(232,245,238,.15)}
+[data-t=light]{--bg:#eef6f1;--fg:#0e2418;--card:rgba(255,255,255,.75);--em:#0f8a5f;--blue:#1a6fa8;--gold:#9c7a10;--line:rgba(14,36,24,.18)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 Georgia,serif;overflow-x:hidden}
+h1,h2,h3,button,select,input,nav a{font-family:"Trebuchet MS",Verdana,sans-serif}
+section{padding:80px 6vw;max-width:1250px;margin:auto}
+h2{font-size:2.2rem;margin:0 0 22px;color:var(--em)}
+header{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 4vw;background:var(--card);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+header nav{display:flex;gap:14px;flex-wrap:wrap}header a{color:var(--fg);text-decoration:none;font-size:.88rem}
+.logo{font-weight:700;color:var(--gold)!important;font-size:1.1rem!important}
+button,select,input{font-size:1rem;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 18px;cursor:pointer;transition:.2s}
+button:hover{transform:translateY(-2px);border-color:var(--em)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.gold{background:var(--gold);color:#201700;border-color:var(--gold);font-weight:700}
+.on{background:var(--em);color:#04120c}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.hero{max-width:none;min-height:94vh;display:grid;place-items:center;text-align:center;perspective:1200px;background:radial-gradient(ellipse at 50% 30%,#0f6a4a77,transparent 60%),radial-gradient(circle at 90% 90%,#1d5f9a66,transparent 50%);overflow:hidden;position:relative}
+.hero h1{font-size:clamp(2.2rem,6.5vw,5rem);line-height:1.02;margin:0;text-shadow:0 8px 40px #2fe3a066;transform:translateZ(60px)}
+.hero p{font-size:1.2rem;max-width:620px;margin:12px auto}
+.scene{transform-style:preserve-3d;transition:transform .15s}
+.ring{position:relative;width:130px;height:130px;margin:60px auto 20px;transform-style:preserve-3d;animation:spin 24s linear infinite}
+.ring i{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:4rem;background:var(--card);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(6px);box-shadow:0 0 30px #2fe3a033}
+@keyframes spin{to{transform:rotateY(360deg)}}
+.stats{display:flex;gap:34px;justify-content:center;flex-wrap:wrap;margin-top:30px}.stats b{display:block;font-size:2.4rem;color:var(--gold)}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.35;animation:fl 9s ease-in-out infinite alternate}
+@keyframes fl{to{transform:translate(40px,-60px) scale(1.2)}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;perspective:1000px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;transform-style:preserve-3d;transition:transform .15s,box-shadow .3s;backdrop-filter:blur(8px)}
+.card:hover{box-shadow:0 24px 50px #0008,0 0 30px #2fe3a02e}
+.card .em{font-size:4.6rem;transform:translateZ(50px);display:inline-block;filter:drop-shadow(0 12px 10px #0006)}
+.card h3,.card .tag{transform:translateZ(25px)}.card .row{position:relative;z-index:2}.card h3{margin:6px 0 0}.tag{color:var(--blue);font-size:.85rem}
+.card .row{margin:10px 0 0}.card button{padding:6px 12px;font-size:.9rem}
+.heart{position:absolute;right:12px;top:12px;font-size:1.3rem;padding:2px 9px!important;}
+blockquote{font-size:1.5rem;border-left:5px solid var(--gold);padding-left:18px;margin:0 0 18px;min-height:4.5em}
+table{border-collapse:collapse;width:100%}td,th{border:1px solid var(--line);padding:9px;text-align:left}th{background:var(--card)}
+.modal{position:fixed;inset:0;background:#000b;display:grid;place-items:center;z-index:100;padding:14px;perspective:1200px}
+[hidden]{display:none!important}
+.box{background:var(--bg);width:100%;max-width:660px;max-height:92vh;overflow:auto;border-radius:22px;padding:26px;border:1px solid var(--em);animation:pop .5s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{transform:rotateX(-50deg) scale(.7);opacity:0}}
+.box .big{font-size:6.5rem;display:inline-block;animation:bob 3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px) rotateY(25deg)}}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.ok{background:var(--em)!important;color:#04120c}.bad{background:#c0452f!important;color:#fff}
+.bars{display:flex;gap:3px;align-items:flex-end;height:30px}.bars s{width:5px;background:var(--em);animation:eq .5s infinite alternate}
+@keyframes eq{to{height:4px}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--gold);color:#201700;padding:12px 22px;border-radius:12px;z-index:200;font-family:Verdana}
+footer{padding:46px 6vw;text-align:center;background:#02100a;color:#cfe9dc}footer a{color:var(--gold);margin:0 8px}
+@media(max-width:760px){header{flex-direction:column}.opts{grid-template-columns:1fr}section{padding:50px 5vw}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.ph{height:180px;border-radius:14px;background:linear-gradient(135deg,#0f6a4a,#1d5f9a);display:grid;place-items:center;font-size:4.2rem;transform:translateZ(40px);box-shadow:0 14px 24px #0007;background-size:cover;background-position:center}
+[data-ph].has{background-size:cover;background-position:center;color:transparent}.has span{opacity:0}
+.box .ph.big{width:100%;height:260px;animation:none;font-size:6rem;margin-bottom:12px;transform:none}
+.ring i.has{border:2px solid var(--gold)}
+h2{border-bottom:2px solid var(--gold);padding-bottom:8px;display:inline-block}
+.scene{position:relative;z-index:1}.hero::before{content:"";position:absolute;inset:0;background:var(--hero,none) center/cover;opacity:.3}
+.grid{perspective:none}.card,.card *{transform:none!important}.card{transform-style:flat}
+.card:hover{border-color:var(--em);box-shadow:0 10px 30px #0006,0 0 24px #2fe3a033}
+button:hover{transform:none}
+</style></head><body>
+<header><a class="logo" href="#bosh">Hayvonlar Olami 3D</a>
+<nav><a href="#bosh">Bosh sahifa</a><a href="#hayvonlar">Hayvonlar</a><a href="#joylar">Yashash joylari</a><a href="#qitalar">Qit'alar</a><a href="#faktlar">Faktlar</a><a href="#viktorina">Viktorina</a><a href="#solishtirish">Solishtirish</a><a href="#asrash">Tabiatni asrash</a><a href="#sevimlilar">Sevimlilar</a><a href="#haqida">Biz haqimizda</a></nav>
+<button id="themeBtn">Qorong'i / Yorug'</button></header>
+
+<section id="bosh" class="hero"><div class="orb" style="width:300px;height:300px;background:#2fe3a0;left:5%;top:10%"></div><div class="orb" style="width:260px;height:260px;background:#4cb8ff;right:8%;bottom:10%"></div>
+<div class="scene" id="scene"><div class="ring" id="ring"></div>
+<h1>Hayvonlar olamiga xush kelibsiz!</h1><p>Tabiatning eng ajoyib mavjudotlarini biz bilan kashf eting!</p>
+<div class="row" style="justify-content:center"><button onclick="go('hayvonlar')">Hayvonlarni kashf etish</button><button onclick="go('hayvonlar');toast('Kartadagi ▶ tugmasini bosing')">Ovozlarni tinglash</button><button onclick="go('faktlar')">Qiziqarli faktlar</button><button class="gold" onclick="go('viktorina')">Viktorina boshlash</button></div>
+<div class="stats" id="stats"></div></div></section>
+
+<section id="hayvonlar"><h2>Hayvonlar katalogi</h2><div class="row"><input id="q" type="search" placeholder="Nomi yoki guruhi bo'yicha qidiring"><select id="grp"></select></div><div class="grid" id="grid"></div><p id="empty" hidden>Bu hayvon topilmadi.</p></section>
+<section id="joylar"><h2>Ularning yashash joylari</h2><div class="row" id="habs"></div><div class="grid" id="habGrid"></div></section>
+<section id="qitalar"><h2>7 qit'a bo'yicha hayvonlar</h2><div class="row" id="conts"></div><div class="grid" id="contGrid"></div></section>
+<section id="faktlar"><h2>Qiziqarli faktlar</h2><blockquote id="fact">Tugmani bosing.</blockquote><button class="gold" id="more">Yana bir fakt</button></section>
+<section id="viktorina"><h2>Viktorina</h2><div id="quiz"></div></section>
+<section id="solishtirish"><h2>Hayvonlarni solishtirish</h2><div class="row"><select id="ca"></select><select id="cb"></select></div><div id="cmp"></div></section>
+<section id="asrash"><h2>Tabiatni asraylik</h2><p>Yo'qolib ketish xavfidagi va zaif turlar (Qizil kitob ma'lumotlariga ko'ra holat o'zgarib turadi):</p><div class="grid" id="red"></div>
+<h3>Qanday yordam berish mumkin</h3><ul><li>Plastik chiqindini kamaytiring va qayta ishlang.</li><li>Yovvoyi hayvon mahsulotlarini sotib olmang.</li><li>Tabiat qo'riqxonalarida qoidalarga amal qiling.</li><li>Daraxt ekib, suvni tejang.</li></ul></section>
+<section id="sevimlilar"><h2>Sevimli hayvonlar</h2><div class="grid" id="favGrid"></div><p id="favEmpty">Hozircha sevimlilar yo'q. Kartadagi yurakni bosing.</p></section>
+<section id="haqida"><h2>Biz haqimizda</h2><p>Bu loyiha hayvonot olamini o'zbek tilida qiziqarli va ko'rgazmali o'rganish uchun yaratilgan. Maqsadimiz: tabiatga muhabbat uyg'otish va noyob turlarni asrashga hissa qo'shish.</p></section>
+<footer><strong>Hayvonlar Olami 3D</strong><div><a href="#hayvonlar">Hayvonlar</a><a href="#viktorina">Viktorina</a><a href="#asrash">Tabiatni asrash</a><a href="mailto:aloqa@hayvonlar-olami.uz">aloqa@hayvonlar-olami.uz</a></div><small>&copy; 2026 Hayvonlar Olami. Barcha huquqlar himoyalangan.</small></footer>
+<div class="modal" id="modal" hidden><div class="box" id="box"></div></div><div class="toast" id="toast" hidden></div>
+<script>
+const $=s=>document.querySelector(s),go=id=>document.getElementById(id).scrollIntoView();
+const toast=m=>{const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(t._);t._=setTimeout(()=>t.hidden=true,3200)};
+// id|uz|en|sci|guruh|emoji|qit'alar|joy|oziq|umr|vazn|tezlik|holat|faktlar|ovoz
+const RAW=`sher|Sher|Lion|Panthera leo|Yovvoyi|🦁|Afrika,Osiyo|Savanna|Go'shtxo'r|10–14 yil|150–250 kg|80 km/s|Zaif|Sherning o'kirishi 8 km gacha eshitiladi;Kuniga 20 soat dam oladi|roar
+yolbars|Yo'lbars|Tiger|Panthera tigris|Yovvoyi|🐯|Osiyo|O'rmon|Go'shtxo'r|10–15 yil|100–300 kg|65 km/s|Yo'qolish arafasida|Yo'llari barmoq izidek betakror;Suvda yaxshi suzadi|roar
+fil|Fil|Elephant|Loxodonta africana|Yovvoyi|🐘|Afrika,Osiyo|Savanna|O'txo'r|60–70 yil|4000–6000 kg|40 km/s|Yo'qolish arafasida|Filning xotirasi kuchli;Quruqlikdagi eng katta hayvon|trumpet
+jirafa|Jirafa|Giraffe|Giraffa camelopardalis|Yovvoyi|🦒|Afrika|Savanna|O'txo'r|20–25 yil|800–1200 kg|60 km/s|Zaif|Bo'yni uzun, lekin umurtqasi 7 ta;Tili 45 sm gacha|hum
+zebra|Zebra|Zebra|Equus quagga|Yovvoyi|🦓|Afrika|Savanna|O'txo'r|25 yil|350 kg|65 km/s|Xavf ostida|Yo'llari betakror;Tik turib uxlaydi|neigh
+bori|Bo'ri|Wolf|Canis lupus|Yovvoyi|🐺|Osiyo,Yevropa,Shimoliy Amerika|O'rmon|Go'shtxo'r|6–8 yil|30–50 kg|60 km/s|Xavotirsiz|Uvillash bilan aloqa qiladi;Oilaviy to'dada yashaydi|howl
+tulki|Tulki|Red fox|Vulpes vulpes|Yovvoyi|🦊|Osiyo,Yevropa,Shimoliy Amerika|O'rmon|Hamma narsa yeydi|3–6 yil|4–8 kg|50 km/s|Xavotirsiz|Eshitish qobiliyati juda o'tkir;Dumi issiq ko'rpa vazifasini bajaradi|bark
+ayiq|Ayiq|Brown bear|Ursus arctos|Yovvoyi|🐻|Osiyo,Yevropa,Shimoliy Amerika|Tog'|Hamma narsa yeydi|20–30 yil|150–400 kg|50 km/s|Xavotirsiz|Qishda uzoq uxlaydi;Hidlashi juda kuchli|roar
+gepard|Gepard|Cheetah|Acinonyx jubatus|Yovvoyi|🐆|Afrika|Savanna|Go'shtxo'r|10–12 yil|40–65 kg|110 km/s|Zaif|Quruqlikdagi eng tezkor hayvon;3 soniyada 100 km/s ga yetadi|chirp
+panda|Panda|Giant panda|Ailuropoda melanoleuca|Yovvoyi|🐼|Osiyo|Tog'|O'txo'r|20 yil|100–150 kg|32 km/s|Zaif|Kuniga 12 soat bambuk yeydi;Bolasi juda kichik tug'iladi|squeak
+kenguru|Kenguru|Kangaroo|Macropus rufus|Yovvoyi|🦘|Avstraliya|Cho'l|O'txo'r|12–18 yil|50–90 kg|70 km/s|Xavotirsiz|Orqaga yura olmaydi;Bolasini xaltada olib yuradi|bark
+gorilla|Gorilla|Gorilla|Gorilla gorilla|Yovvoyi|🦍|Afrika|O'rmon|O'txo'r|35–40 yil|140–200 kg|40 km/s|Yo'qolish arafasida|Ko'kragiga urib signal beradi;Oilaviy guruhda yashaydi|roar
+it|It|Dog|Canis familiaris|Uy hayvoni|🐕|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Inson yonida|Hamma narsa yeydi|10–13 yil|5–40 kg|30 km/s|Xavotirsiz|Inson bilan 10 000 yildan ortiq yashaydi;Hidlashi juda kuchli|bark
+mushuk|Mushuk|Cat|Felis catus|Uy hayvoni|🐈|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Inson yonida|Go'shtxo'r|12–18 yil|3–5 kg|48 km/s|Xavotirsiz|Kuniga 13–16 soat uxlaydi;Qorong'ida yaxshi ko'radi|meow
+ot|Ot|Horse|Equus caballus|Uy hayvoni|🐎|Osiyo,Yevropa,Shimoliy Amerika|Yaylov|O'txo'r|25–30 yil|380–550 kg|88 km/s|Xavotirsiz|Tik turib uxlay oladi;Ko'zlari boshining ikki yonida|neigh
+sigir|Sigir|Cow|Bos taurus|Uy hayvoni|🐄|Osiyo,Yevropa,Shimoliy Amerika|Yaylov|O'txo'r|18–22 yil|500–700 kg|30 km/s|Xavotirsiz|Kuniga 8 soat go'ng'irlab ovqat chaynaydi;Do'stlarini taniydi|moo
+qoy|Qo'y|Sheep|Ovis aries|Uy hayvoni|🐑|Osiyo,Yevropa,Avstraliya|Yaylov|O'txo'r|10–12 yil|45–100 kg|35 km/s|Xavotirsiz|Chehralarni eslab qoladi;Juni yiliga bir marta qirqiladi|bleat
+burgut|Burgut|Eagle|Aquila chrysaetos|Qush|🦅|Osiyo,Yevropa,Shimoliy Amerika|Tog'|Go'shtxo'r|20–30 yil|3–6 kg|160 km/s|Xavotirsiz|Ko'rishi juda o'tkir;Baland tog'larda uya quradi|screech
+totiqush|To'tiqush|Parrot|Psittaciformes|Qush|🦜|Janubiy Amerika,Afrika,Avstraliya|Tropik o'rmon|O'txo'r|20–60 yil|0.1–1.5 kg|40 km/s|Zaif|Inson ovozini taqlid qiladi;Juda aqlli qush|chirp
+boyqush|Boyqush|Owl|Strigiformes|Qush|🦉|Osiyo,Yevropa,Shimoliy Amerika|O'rmon|Go'shtxo'r|10–25 yil|0.5–4 kg|40 km/s|Xavotirsiz|Jimgina uchadi;Boshini 270° buradi|hoot
+pingvin|Pingvin|Penguin|Aptenodytes forsteri|Qush|🐧|Antarktida|Muz|Baliq va qisqichbaqa|15–20 yil|22–45 kg|10 km/s|Xavotirsiz|Uchmaydi, lekin zo'r suzadi;Tuxumni oyoqlarida isitadi|squeak
+delfin|Delfin|Dolphin|Tursiops truncatus|Suv hayvoni|🐬|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Okean|Go'shtxo'r|20–40 yil|150–300 kg|55 km/s|Xavotirsiz|Murakkab tovushlar orqali muloqot qiladi;Uxlaganda miyasining yarmi uyg'oq|whistle
+kit|Kit|Blue whale|Balaenoptera musculus|Suv hayvoni|🐋|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya,Antarktida|Okean|Kril|80–90 yil|100 000+ kg|30 km/s|Xavf ostida|Yerdagi eng katta hayvon;Ovozi yuzlab km uzoqqa boradi|whale
+ahtapot|Ahtapot|Octopus|Octopus vulgaris|Suv hayvoni|🐙|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Okean|Go'shtxo'r|1–2 yil|3–10 kg|40 km/s|Xavotirsiz|Ahtapotning uchta yuragi bor;Rangini tez o'zgartiradi|none
+qurbaqa|Qurbaqa|Frog|Rana temporaria|Suv hayvoni|🐸|Osiyo,Yevropa,Shimoliy Amerika|Daryo va ko'l|Hasharotxo'r|8–10 yil|0.02–0.3 kg|15 km/s|Xavotirsiz|Teri orqali nafas oladi;Qurillashi bilan jufti chaqiriladi|croak
+tuya|Tuya|Camel|Camelus bactrianus|Uy hayvoni|🐪|Osiyo,Afrika|Cho'l|O'txo'r|40–50 yil|450–700 kg|65 km/s|Yo'qolish arafasida|Cho'lda haftalab suvsiz yuradi;O'rkachida yog' to'planadi|moo
+karkidon|Karkidon|Rhinoceros|Rhinocerotidae|Yovvoyi|🦏|Afrika,Osiyo|Savanna|O'txo'r|35–50 yil|1000–2300 kg|50 km/s|Yo'qolish arafasida|Shoxi tirnoq kabi keratindan iborat;Ko'rishi yomon, eshitishi yaxshi|moo
+begemot|Begemot|Hippopotamus|Hippopotamus amphibius|Yovvoyi|🦛|Afrika|Daryo va ko'l|O'txo'r|40–50 yil|1300–1800 kg|30 km/s|Zaif|Kunning ko'p qismini suvda o'tkazadi;Terisi qizg'ish suyuqlik ajratadi|moo
+maymun|Maymun|Monkey|Cercopithecidae|Yovvoyi|🐒|Osiyo,Afrika|Tropik o'rmon|Hamma narsa yeydi|20–30 yil|5–15 kg|50 km/s|Xavotirsiz|Guruhda yashaydi;Qo'llari juda chaqqon|squeak
+qoplon|Qoplon|Leopard|Panthera pardus|Yovvoyi|🐆|Afrika,Osiyo|O'rmon|Go'shtxo'r|12–15 yil|30–90 kg|58 km/s|Zaif|O'ljasini daraxtga olib chiqadi;Dog'lari barmoq izidek betakror|roar
+koala|Koala|Koala|Phascolarctos cinereus|Yovvoyi|🐨|Avstraliya|O'rmon|Evkalipt bargi|13–18 yil|4–15 kg|30 km/s|Zaif|Kuniga 20 soat uxlaydi;Faqat evkalipt bargi bilan oziqlanadi|hum
+lama|Lama|Llama|Lama glama|Uy hayvoni|🦙|Janubiy Amerika|Tog'|O'txo'r|20–25 yil|130–200 kg|45 km/s|Xavotirsiz|And tog'larida yuk tashiydi;Xafa bo'lsa tupuradi|bleat
+quyon|Quyon|Rabbit|Oryctolagus cuniculus|Uy hayvoni|🐇|Yevropa,Osiyo,Shimoliy Amerika|Yaylov|O'txo'r|8–12 yil|1–2 kg|56 km/s|Xavotirsiz|Tishlari butun umr o'sadi;Ko'zlari boshining yon tomonida|none
+echki|Echki|Goat|Capra hircus|Uy hayvoni|🐐|Osiyo,Yevropa,Afrika|Tog'|O'txo'r|12–15 yil|20–80 kg|40 km/s|Xavotirsiz|Qoyalarga mohirona chiqadi;Qorachig'i to'rtburchak|bleat
+chochqa|Cho'chqa|Pig|Sus domesticus|Uy hayvoni|🐖|Osiyo,Yevropa,Shimoliy Amerika|Inson yonida|Hamma narsa yeydi|10–15 yil|100–250 kg|17 km/s|Xavotirsiz|Juda aqlli hayvon;Terlay olmaydi, shuning uchun loyga yotadi|hum
+tovus|Tovus|Peafowl|Pavo cristatus|Qush|🦚|Osiyo|O'rmon|Hamma narsa yeydi|15–20 yil|3–6 kg|16 km/s|Xavotirsiz|Erkagining dumi 1,5 m gacha;Dumini yoyib urg'ochini jalb qiladi|screech
+flamingo|Flamingo|Flamingo|Phoenicopteridae|Qush|🦩|Afrika,Janubiy Amerika,Yevropa|Daryo va ko'l|Plankton|30–40 yil|2–4 kg|60 km/s|Xavotirsiz|Pushti rangi ovqatidan olinadi;Bir oyoqda uxlaydi|chirp
+oqqush|Oqqush|Swan|Cygnus olor|Qush|🦢|Yevropa,Osiyo|Daryo va ko'l|O'txo'r|20–30 yil|8–12 kg|60 km/s|Xavotirsiz|Juftini umr bo'yi tanlaydi;Qanoti kuchli|hoot
+kabutar|Kabutar|Rock dove|Columba livia|Qush|🕊️|Osiyo,Yevropa,Afrika|Shahar|Don|10–15 yil|0.3 kg|90 km/s|Xavotirsiz|Uyini minglab km dan topadi;Yo'llar bilan xabar tashigan|hoot
+akula|Akula|Great white shark|Carcharodon carcharias|Suv hayvoni|🦈|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Okean|Go'shtxo'r|70 yil|700–1100 kg|56 km/s|Zaif|Skeleti suyakdan emas, tog'aydan iborat;Tishlari doim yangilanadi|none
+kalmar|Kalmar|Squid|Teuthida|Suv hayvoni|🦑|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Okean|Go'shtxo'r|1–2 yil|1–30 kg|40 km/s|Xavotirsiz|Uch yuragi bor;Reaktiv harakat bilan suzadi|none
+toshbaqa|Dengiz toshbaqasi|Sea turtle|Chelonioidea|Suv hayvoni|🐢|Osiyo,Afrika,Avstraliya,Shimoliy Amerika|Okean|Hamma narsa yeydi|50–80 yil|70–300 kg|35 km/s|Yo'qolish arafasida|Tuxum qo'yish uchun tug'ilgan qirg'oqqa qaytadi;Bir necha soat nafas ushlay oladi|none
+tyulen|Tyulen|Seal|Phocidae|Suv hayvoni|🦭|Shimoliy Amerika,Yevropa,Antarktida|Muz|Baliq|25–30 yil|60–200 kg|35 km/s|Xavotirsiz|Qalin yog' qatlami sovuqdan saqlaydi;Chuqur sho'ng'iydi|bark
+krokodil|Krokodil|Nile crocodile|Crocodylus niloticus|Sudralib yuruvchi|🐊|Afrika|Daryo va ko'l|Go'shtxo'r|50–70 yil|220–730 kg|35 km/s|Xavotirsiz|Dinozavrlar davridan beri deyarli o'zgarmagan;Tishlash kuchi juda katta|roar
+ilon|Ilon|Snake|Serpentes|Sudralib yuruvchi|🐍|Osiyo,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Cho'l|Go'shtxo'r|10–25 yil|1–100 kg|20 km/s|Xavotirsiz|Tili bilan hid sezadi;Ko'zi qovoqsiz|none
+qutbayiq|Qutb ayig'i|Polar bear|Ursus maritimus|Yovvoyi|🐻|Shimoliy Amerika,Yevropa,Osiyo|Muz|Go'shtxo'r|20–25 yil|350–700 kg|40 km/s|Zaif|Terisi aslida qora;Yaxshi suzadi|roar
+kolibri|Kolibri|Hummingbird|Trochilidae|Qush|🐦|Shimoliy Amerika,Janubiy Amerika|Tropik o'rmon|Nektar|3–5 yil|2–20 g|50 km/s|Xavotirsiz|Orqaga ucha oladigan yagona qush;Qanotini soniyasiga 50 marta qoqadi|chirp
+chumoli|Chumoli|Ant|Formicidae|Hasharot|🐜|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|O'rmon|Hamma narsa yeydi|1–3 yil|3–5 mg|2 km/s|Xavotirsiz|O'z vazniga nisbatan juda katta yuk ko'taradi;Kolonyada yashaydi|none
+asalari|Asalari|Honey bee|Apis mellifera|Hasharot|🐝|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Yaylov|Nektar|1–6 oy|0.1 g|25 km/s|Xavotirsiz|Raqs orqali gul yo'lini ko'rsatadi;Bir oilada 50 000 gacha ari bo'ladi|hum
+kapalak|Kapalak|Butterfly|Lepidoptera|Hasharot|🦋|Osiyo,Yevropa,Afrika,Shimoliy Amerika,Janubiy Amerika,Avstraliya|Yaylov|Nektar|2–4 hafta|0.5 g|20 km/s|Xavotirsiz|Qurtdan g'umbak orqali aylanadi;Oyoqlari bilan ta'm sezadi|none`;
+const ANIM=RAW.split('\n').map(l=>{const p=l.split('|');return{id:p[0],uz:p[1],en:p[2],sci:p[3],grp:p[4],em:p[5],cont:p[6].split(','),hab:p[7],diet:p[8],life:p[9],w:p[10],sp:p[11],st:p[12],facts:p[13].split(';'),snd:p[14]}});
+// Favorites
+const Fav={g(){try{return JSON.parse(localStorage.getItem('fav'))||[]}catch(e){return[]}},has(i){return this.g().includes(i)},t(i){let l=this.g();l=l.includes(i)?l.filter(x=>x!=i):[...l,i];try{localStorage.setItem('fav',JSON.stringify(l))}catch(e){}}};
+// Haqiqiy rasm (Wikipedia) va ovoz (Wikimedia Commons) ish vaqtida yuklanadi
+const IP=new Map();
+function img(a){if(IP.has(a.id))return IP.get(a.id);const k='img2:'+a.id;let c='';try{c=localStorage.getItem(k)||''}catch(e){}
+ const pr=c?Promise.resolve(c):fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(a.en.replace(/ /g,'_'))).then(r=>r.json()).then(j=>{const u=(j.thumbnail&&j.thumbnail.source)||'';if(u)try{localStorage.setItem(k,u)}catch(e){}return u}).catch(()=>'');
+ IP.set(a.id,pr);return pr}
+const sz=(u,w)=>u.replace(/\/\d+px-/,'/'+w+'px-');
+function show(e,u,fb){const t=new Image();t.onload=()=>{e.style.backgroundImage='url("'+u+'")';e.classList.add('has')};t.onerror=()=>{if(fb)show(e,fb)};t.src=u}
+function hydrate(box){box.querySelectorAll('[data-ph]').forEach(async e=>{const a=ANIM.find(x=>x.id==e.dataset.ph),u=await img(a);if(u)show(e,sz(u,500),u)})}
+// Sintezlangan ovozlar (Web Audio): haqiqiy yozuv emas, taxminiy
+let AC,cur=null;
+const P={roar:{w:'sawtooth',d:1.6,f:[[0,90],[.3,120],[1.6,45]],lp:400,n:.4},trumpet:{w:'sawtooth',d:1.3,f:[[0,250],[.3,650],[1.3,420]],lp:1800,v:12},hum:{w:'sine',d:1,f:[[0,110],[1,90]],lp:300},neigh:{w:'sawtooth',d:1.2,f:[[0,500],[.3,950],[.8,700],[1.2,350]],lp:2500,v:18},howl:{w:'sine',d:2.2,f:[[0,280],[.8,620],[1.8,560],[2.2,300]],lp:1500,v:6},bark:{w:'square',d:.45,f:[[0,520],[.12,320],[.2,500],[.35,280]],lp:1400,pulse:1},meow:{w:'sawtooth',d:.8,f:[[0,600],[.25,950],[.8,500]],lp:1800,bp:1},moo:{w:'triangle',d:1.5,f:[[0,170],[.5,140],[1.5,110]],lp:600},bleat:{w:'sawtooth',d:.9,f:[[0,400],[.9,380]],lp:1500,v:35},screech:{w:'sawtooth',d:.9,f:[[0,2100],[.4,1700],[.9,1300]],lp:4000},chirp:{w:'sine',d:.7,f:[[0,2000],[.1,3200],[.2,2200],[.35,3400],[.5,2400],[.7,3000]],lp:5000},hoot:{w:'sine',d:1.2,f:[[0,380],[.3,330],[.5,380],[.8,320]],lp:800},squeak:{w:'sine',d:.5,f:[[0,1500],[.25,2200],[.5,1700]],lp:3500},whistle:{w:'sine',d:1,f:[[0,1800],[.4,4200],[1,2500]],lp:6000,v:20},whale:{w:'sine',d:2.5,f:[[0,80],[1,200],[2,120],[2.5,70]],lp:500},croak:{w:'sawtooth',d:.6,f:[[0,140],[.6,100]],lp:700,pulse:1,v:40}};
+function play(a,vol=.8){stop();const p=P[a.snd];if(!p){toast(a.uz+' ovoz chiqarmaydi.');return 0}
+ AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();
+ o.type=p.w;f.type='lowpass';f.frequency.value=p.lp;o.frequency.setValueAtTime(p.f[0][1],AC.currentTime);p.f.forEach(([t,hz])=>o.frequency.linearRampToValueAtTime(hz,AC.currentTime+t));
+ g.gain.setValueAtTime(0,AC.currentTime);g.gain.linearRampToValueAtTime(vol*.5,AC.currentTime+.05);g.gain.linearRampToValueAtTime(0,AC.currentTime+p.d);
+ if(p.v){const l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=p.v;lg.gain.value=30;l.connect(lg);lg.connect(o.frequency);l.start()}
+ o.connect(f);f.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+p.d);cur={o,g,max:vol};o.onended=()=>{cur=null;const b=$('#bars');if(b)b.hidden=true};
+ const b=$('#bars');if(b){b.hidden=false;$('#dur').textContent=p.d.toFixed(1)+' soniya'}return p.d}
+function stop(){if(cur){try{cur.o.stop()}catch(e){}cur=null}}
+const SC=new Map();let tok=0;
+async function commons(a){if(SC.has(a.id))return SC.get(a.id);let r=null;try{const w=a.en.toLowerCase().split(' ').pop().replace(/s$/,'');
+ const j=await(await fetch('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=20&gsrsearch='+encodeURIComponent(a.en+' filetype:audio')+'&prop=imageinfo&iiprop=url|mime')).json();
+ const pg=Object.values((j.query||{}).pages||{}).filter(p=>p.title.toLowerCase().includes(w)&&p.imageinfo&&/audio|ogg/.test(p.imageinfo[0].mime)).sort((x,y)=>x.index-y.index)[0];
+ if(pg)r={url:pg.imageinfo[0].url,title:pg.title.replace('File:','')}}catch(e){}SC.set(a.id,r);return r}
+async function playReal(a,vol=.8,quiet){stop();const my=++tok;toast('Ovoz yuklanmoqda...');const r=await commons(a);if(my!==tok)return;
+ if(!r){const d=play(a,vol);if(d&&!quiet)toast('Haqiqiy yozuv topilmadi, taxminiy sintez ijro etilmoqda.');return}
+ const au=new Audio(r.url);au.volume=vol;au.onerror=()=>{if(my===tok)play(a,vol)};
+ au.onloadedmetadata=()=>{const d=$('#dur');if(d)d.textContent=au.duration.toFixed(1)+' soniya'};
+ au.onended=()=>{cur=null;const b=$('#bars');if(b)b.hidden=true};
+ try{await au.play()}catch(e){return}cur={o:{stop:()=>au.pause()},au};const b=$('#bars');if(b)b.hidden=false;const s=$('#src');if(s&&!quiet)s.textContent='Manba: Wikimedia Commons, '+r.title}
+// Statistika
+const CONTS=['Osiyo','Afrika','Yevropa','Shimoliy Amerika','Janubiy Amerika','Avstraliya','Antarktida'],GRPS=[...new Set(ANIM.map(a=>a.grp))],HABS=[...new Set(ANIM.map(a=>a.hab))];
+$('#stats').innerHTML=[[ANIM.length,'hayvon turi'],[7,'qit\'a'],[GRPS.length,'guruh'],[ANIM.reduce((s,a)=>s+a.facts.length,0),'qiziqarli fakt']].map(([n,l])=>`<div><b data-n="${n}">0</b>${l}</div>`).join('');
+document.querySelectorAll('[data-n]').forEach(e=>{const n=+e.dataset.n;let i=0;const t=setInterval(()=>{e.textContent=++i;if(i>=n)clearInterval(t)},50)});
+// 3D halqa va sichqoncha parallaks
+const RING=ANIM.slice(0,8);$('#ring').innerHTML=RING.map((a,i)=>`<i data-ph="${a.id}" style="transform:rotateY(${i*45}deg) translateZ(260px)">${a.em}</i>`).join('');
+const hero=$('#bosh');hero.onmousemove=e=>{const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;$('#scene').style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`};
+// Karta (3D tilt)
+const card=a=>`<article class="card"><button class="heart" data-f="${a.id}" aria-label="Sevimli">${Fav.has(a.id)?'♥':'♡'}</button><div class="ph" data-ph="${a.id}"><span>${a.em}</span></div><h3>${a.uz}</h3><div class="tag">${a.grp} · ${a.hab}</div><div class="row"><button data-d="${a.id}">Batafsil</button><button data-p="${a.id}" aria-label="Ovozni eshitish">▶ Ovoz</button></div></article>`;
+function bind(box){hydrate(box);box.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>open(b.dataset.d));box.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{Fav.t(b.dataset.f);all()});
+ box.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>playReal(ANIM.find(a=>a.id==b.dataset.p)));
+ box.querySelectorAll('[data-tilt]').forEach(c=>{c.onmousemove=e=>{if(e.target.closest('button'))return;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform=`rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.02)`};c.onmouseleave=()=>c.style.transform=''})}
+const put=(sel,list,empty='')=>{const el=$(sel);el.innerHTML=list.map(card).join('')||empty;bind(el)};
+function grid(){const q=$('#q').value.trim().toLowerCase(),g=$('#grp').value;const r=ANIM.filter(a=>(!g||a.grp==g)&&(!q||[a.uz,a.en,a.grp].some(s=>s.toLowerCase().includes(q))));put('#grid',r);$('#empty').hidden=r.length>0}
+let hs=HABS[0],cs=CONTS[0];
+const tabs=(sel,items,cur,fn)=>{$(sel).innerHTML=items.map(i=>`<button class="${i==cur?'on':''}">${i}</button>`).join('');$(sel).querySelectorAll('button').forEach(b=>b.onclick=()=>fn(b.textContent))};
+function all(){grid();tabs('#habs',HABS,hs,v=>{hs=v;all()});put('#habGrid',ANIM.filter(a=>a.hab==hs));tabs('#conts',CONTS,cs,v=>{cs=v;all()});put('#contGrid',ANIM.filter(a=>a.cont.includes(cs)),'<p>Bu qit\'a uchun hayvon hali qo\'shilmagan.</p>');
+ put('#red',ANIM.filter(a=>/Yo'qolish|Xavf|Zaif/.test(a.st)));const f=ANIM.filter(a=>Fav.has(a.id));put('#favGrid',f);$('#favEmpty').hidden=f.length>0}
+$('#grp').innerHTML='<option value="">Barcha guruhlar</option>'+GRPS.map(g=>`<option>${g}</option>`).join('');$('#q').oninput=grid;$('#grp').onchange=grid;
+// Modal
+function open(id){const a=ANIM.find(x=>x.id==id);$('#box').innerHTML=`<div class="ph big" data-ph="${a.id}"><span>${a.em}</span></div><h2>${a.uz}</h2><table><tr><th>Inglizcha</th><td>${a.en}</td></tr><tr><th>Ilmiy nomi</th><td><i>${a.sci}</i></td></tr><tr><th>Guruh</th><td>${a.grp}</td></tr><tr><th>Qit'alar</th><td>${a.cont.join(', ')}</td></tr><tr><th>Yashash joyi</th><td>${a.hab}</td></tr><tr><th>Oziqlanishi</th><td>${a.diet}</td></tr><tr><th>Umri</th><td>${a.life}</td></tr><tr><th>Vazni</th><td>${a.w}</td></tr><tr><th>Tezligi</th><td>${a.sp}</td></tr><tr><th>Muhofaza</th><td>${a.st}</td></tr></table><h3>Faktlar</h3><ul>${a.facts.map(f=>`<li>${f}</li>`).join('')}</ul>
+<div class="row"><button id="pl" class="gold">▶ Ovozni eshitish</button><button id="sp">To'xtatish</button><input id="vol" type="range" min="0" max="1" step=".1" value=".8" aria-label="Balandlik"><button id="cl">Yopish</button></div><div class="row"><div class="bars" id="bars" hidden><s></s><s style="animation-delay:.1s"></s><s style="animation-delay:.2s"></s><s style="animation-delay:.3s"></s></div><span id="dur"></span></div><small id="src">Ovoz Wikimedia Commons'dan olinadi. Topilmasa, taxminiy sintez ishlatiladi.</small>`;
+ $('#modal').hidden=false;$('#pl').onclick=()=>playReal(a,+$('#vol').value);$('#vol').oninput=e=>{if(cur&&cur.au)cur.au.volume=+e.target.value};hydrate($('#box'));$('#sp').onclick=()=>{stop();$('#bars').hidden=true};$('#cl').onclick=close}
+function close(){stop();$('#modal').hidden=true}$('#modal').onclick=e=>{if(e.target.id=='modal')close()};addEventListener('keydown',e=>e.key=='Escape'&&close());
+// Faktlar
+const FACTS=ANIM.flatMap(a=>a.facts.map(f=>a.uz+': '+f));$('#more').onclick=()=>$('#fact').textContent=FACTS[Math.random()*FACTS.length|0];
+// Solishtirish
+const op=ANIM.map(a=>`<option value="${a.id}">${a.uz}</option>`).join('');$('#ca').innerHTML=op;$('#cb').innerHTML=op;$('#cb').selectedIndex=1;
+function cmp(){const a=ANIM.find(x=>x.id==$('#ca').value),b=ANIM.find(x=>x.id==$('#cb').value);$('#cmp').innerHTML=`<table><tr><th></th><th>${a.uz}</th><th>${b.uz}</th></tr>${[['Vazni','w'],['Tezligi','sp'],['Umri','life'],['Oziqlanishi','diet'],['Yashash joyi','hab']].map(([l,k])=>`<tr><th>${l}</th><td>${a[k]}</td><td>${b[k]}</td></tr>`).join('')}</table>`}
+$('#ca').onchange=cmp;$('#cb').onchange=cmp;cmp();
+// Tema
+const R=document.documentElement;try{R.dataset.t=localStorage.getItem('t')||'dark'}catch(e){R.dataset.t='dark'}
+$('#themeBtn').onclick=()=>{R.dataset.t=R.dataset.t=='dark'?'light':'dark';try{localStorage.setItem('t',R.dataset.t)}catch(e){}};
+// Viktorina: rasm, yashash joyi, ovoz
+const Q={n:0,s:0,T:10,sh:a=>[...a].sort(()=>Math.random()-.5),
+ start(){this.n=0;this.s=0;this.next()},
+ next(){const el=$('#quiz');if(this.n>=this.T){el.innerHTML=`<h3>Natija: ${this.s} / ${this.T}</h3><button class="gold" id="ag">Qayta o'ynash</button>`;$('#ag').onclick=()=>this.start();return}
+  const m=this.n%3,pool=m==2?ANIM.filter(a=>P[a.snd]):ANIM,a=this.sh(pool)[0];let q,ans,all2;
+  if(m==0){q=`<div style="font-size:5rem">${a.em}</div><p>Bu qaysi hayvon?</p>`;ans=a.uz;all2=ANIM.map(x=>x.uz)}
+  else if(m==1){q=`<p>${a.uz} qayerda yashaydi?</p>`;ans=a.hab;all2=HABS}
+  else{q=`<button class="gold" id="qs">▶ Ovozni eshitish</button><p>Bu qaysi hayvonning ovozi?</p>`;ans=a.uz;all2=ANIM.map(x=>x.uz)}
+  const o=this.sh([ans,...this.sh(all2.filter(x=>x!=ans)).slice(0,3)]);
+  el.innerHTML=`<p>Savol ${this.n+1}/${this.T} · Ball: ${this.s}</p>${q}<div class="opts">${o.map(x=>`<button>${x}</button>`).join('')}</div>`;
+  if(m==2)$('#qs').onclick=()=>playReal(a,.8,true);
+  el.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>{const r=b.textContent==ans;if(r)this.s++;b.classList.add(r?'ok':'bad');el.querySelectorAll('.opts button').forEach(x=>{x.disabled=1;if(x.textContent==ans)x.classList.add('ok')});this.n++;setTimeout(()=>this.next(),1000)})}};
+all();Q.start();hydrate($('#ring'));img(ANIM[0]).then(u=>u&&hero.style.setProperty('--hero','url("'+sz(u,960)+'")'));
+</script></body></html>
